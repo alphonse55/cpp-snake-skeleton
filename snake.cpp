@@ -53,22 +53,42 @@ std::vector<int> backgroundSetup(const int &nx, const int &ny)
 
 void add_snake(const std::vector<std::pair<int, int>> &snake, std::vector<int> &bg, int nx, int ny)
 {
-  // 👉️ Your code here 👈️
+  for (const auto& segment : snake) {
+    bg[segment.second*nx + segment.first] = 3;
+  }
 }
 
 void remove_snake(const std::vector<std::pair<int, int>> &snake, std::vector<int> &bg, int nx, int ny)
 {
-  // 👉️ Your code here 👈️
+  for (const auto& segment : snake) {
+    bg[segment.second*nx + segment.first] = 0;
+  }
 }
 
 std::array<int, 2> snake_movement(char key)
 {
-  // 👉️ Your code here 👈️
+  switch (key) {
+    case 'R': // Right
+        return {1, 0};
+    case 'L': // Left
+        return {-1, 0};
+    case 'U': // Up
+        return {0, -1};
+    case 'D': // Down
+        return {0, 1};
+    default: // Invalid input
+        return {0, 0}; // No movement
+  }
 }
 
 bool verifyBorder(const std::vector<std::pair<int, int>> &snake, int nx, int ny)
 {
-  // 👉️ Your code here 👈️
+  for (const auto& segment : snake) {
+    if (segment.first >= nx || segment.first <= 0 || segment.second >= ny || segment.second <= 0){
+      return true;
+    }
+  }
+  return false;
 }
 
 std::vector<std::pair<int, int>> setupSnake(int snake_len)
@@ -85,7 +105,11 @@ std::vector<std::pair<int, int>> setupSnake(int snake_len)
 
 void update_snake_coordinates(std::vector<std::pair<int, int>> &snake, bool eat, std::array<int, 2> dxdy)
 {
-  // 👉️ Your code here 👈️
+  if (eat == false){
+    snake.erase(snake.begin());
+  }
+  std::pair<int, int> newSegment = {snake.back().first + dxdy[0], snake.back().second + dxdy[1]};
+  snake.push_back(newSegment);
 }
 
 void startGame(const int &lap, const int &nx, const int &ny, std::vector<std::pair<int, int>> &snake, std::vector<int> &bg)
@@ -104,10 +128,13 @@ void startGame(const int &lap, const int &nx, const int &ny, std::vector<std::pa
     }
     internal::backgroundClear();
     add_snake(snake, bg, nx, ny);
+    if (dxdy == std::array<int, 2> {0, -1}){
+      bg[2*nx+ 2] = 2;
+    }
     internal::printFrame(nx, ny, bg);
     remove_snake(snake, bg, nx, ny);
     bool out = verifyBorder(snake, nx, ny);
-    if (out == false)
+    if (out)
     {
       std::cerr << "" << std::endl;
       exit(1);
