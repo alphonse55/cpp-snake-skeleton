@@ -8,6 +8,10 @@
 #include "stdio.h"
 #include "time.h"
 #include "stdlib.h"
+#include <fstream>
+
+std::ofstream logFile("debug_log.txt", std::ios::app);
+
 
 namespace internal
 {
@@ -67,17 +71,19 @@ void remove_snake(const std::vector<std::pair<int, int>> &snake, std::vector<int
 
 std::array<int, 2> snake_movement(char key)
 {
+  logFile << "Key received: " << key << std::endl;
   switch (key) {
-    case 'R': // Right
+    case 'd': // Right
         return {1, 0};
-    case 'L': // Left
+    case 'q': // Left
         return {-1, 0};
-    case 'U': // Up
+    case 'z': // Up
         return {0, -1};
-    case 'D': // Down
+    case 's': // Down
         return {0, 1};
     default: // Invalid input
-        return {0, 0}; // No movement
+      logFile << "Invalid key! Returning {0, 0}" << std::endl;
+      return {0, 0}; // No movement
   }
 }
 
@@ -128,9 +134,6 @@ void startGame(const int &lap, const int &nx, const int &ny, std::vector<std::pa
     }
     internal::backgroundClear();
     add_snake(snake, bg, nx, ny);
-    if (dxdy == std::array<int, 2> {0, -1}){
-      bg[2*nx+ 2] = 2;
-    }
     internal::printFrame(nx, ny, bg);
     remove_snake(snake, bg, nx, ny);
     bool out = verifyBorder(snake, nx, ny);
